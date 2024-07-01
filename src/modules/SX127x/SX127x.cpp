@@ -9,8 +9,8 @@ SX127x::SX127x(Module* mod) : PhysicalLayer(RADIOLIB_SX127X_FREQUENCY_STEP_SIZE,
 int16_t SX127x::begin(uint8_t* chipVersions, uint8_t numVersions, uint8_t syncWord, uint16_t preambleLength) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
 
   // try to find the SX127x chip
   if(!SX127x::findChip(chipVersions, numVersions)) {
@@ -60,8 +60,8 @@ int16_t SX127x::begin(uint8_t* chipVersions, uint8_t numVersions, uint8_t syncWo
 int16_t SX127x::beginFSK(uint8_t* chipVersions, uint8_t numVersions, float freqDev, float rxBw, uint16_t preambleLength, bool enableOOK) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
 
   // try to find the SX127x chip
   if(!SX127x::findChip(chipVersions, numVersions)) {
@@ -170,7 +170,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for packet transmission or timeout
   start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start > timeout) {
       finishTransmit();
@@ -205,7 +205,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
 
     // wait for packet reception or timeout
     RadioLibTime_t start = this->mod->hal->millis();
-    while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+    while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
       this->mod->hal->yield();
 
       if(this->mod->getGpio() == RADIOLIB_NC) {
@@ -216,7 +216,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
         }
       } else {
         // GPIO provided, use that
-        if(this->mod->hal->digitalRead(this->mod->getGpio())) {
+        if(this->mod->hal->_digitalRead(this->mod->getGpio())) {
           clearIRQFlags();
           return(RADIOLIB_ERR_RX_TIMEOUT);
         }
@@ -234,7 +234,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
 
     // wait for packet reception or timeout
     RadioLibTime_t start = this->mod->hal->millis();
-    while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+    while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
       this->mod->hal->yield();
       if(this->mod->hal->millis() - start > timeout) {
         clearIRQFlags();
@@ -255,9 +255,9 @@ int16_t SX127x::scanChannel() {
   RADIOLIB_ASSERT(state);
 
   // wait for channel activity detected or timeout
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
-    if(this->mod->hal->digitalRead(this->mod->getGpio())) {
+    if(this->mod->hal->_digitalRead(this->mod->getGpio())) {
       return(RADIOLIB_PREAMBLE_DETECTED);
     }
   }
@@ -436,25 +436,25 @@ int16_t SX127x::startReceive(uint32_t timeout, uint32_t irqFlags, uint32_t irqMa
 }
 
 void SX127x::setDio0Action(void (*func)(void), uint32_t dir) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, dir);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, dir);
 }
 
 void SX127x::clearDio0Action() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void SX127x::setDio1Action(void (*func)(void), uint32_t dir) {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, dir);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, dir);
 }
 
 void SX127x::clearDio1Action() {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
 }
 
 void SX127x::setPacketReceivedAction(void (*func)(void)) {
@@ -1641,7 +1641,7 @@ void SX127x::setDirectAction(void (*func)(void)) {
 }
 
 void SX127x::readBit(uint32_t pin) {
-  updateDirectBuffer((uint8_t)this->mod->hal->digitalRead(pin));
+  updateDirectBuffer((uint8_t)this->mod->hal->_digitalRead(pin));
 }
 #endif
 

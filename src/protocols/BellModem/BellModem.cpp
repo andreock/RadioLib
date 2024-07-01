@@ -72,9 +72,9 @@ size_t BellClient::write(uint8_t b) {
   for(uint16_t mask = 0x80; mask >= 0x01; mask >>= 1) {
     RadioLibTime_t start = mod->hal->micros();
     if(b & mask) {
-      this->tone(toneMark, false);
+      this->_tone(toneMark, false);
     } else {
-      this->tone(toneSpace, false);
+      this->_tone(toneSpace, false);
     }
     mod->waitForMicroseconds(start, this->toneLen);
   }

@@ -94,9 +94,9 @@ void loop() {
     }
 
     // we only play the note for 90% of the duration, leaving 10% as a pause
-    audio.tone(melody[note]);
+    audio._tone(melody[note]);
     delay(noteDuration*0.9);
-    audio.noTone();
+    audio._noTone();
     delay(noteDuration*0.1);
   }
 

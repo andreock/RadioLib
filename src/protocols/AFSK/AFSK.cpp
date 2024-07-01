@@ -14,7 +14,7 @@ int16_t AFSKClient::begin() {
   return(phyLayer->startDirect());
 }
 
-int16_t AFSKClient::tone(uint16_t freq, bool autoStart) {
+int16_t AFSKClient::_tone(uint16_t freq, bool autoStart) {
   if(freq == 0) {
     return(RADIOLIB_ERR_INVALID_FREQUENCY);
   }
@@ -25,13 +25,13 @@ int16_t AFSKClient::tone(uint16_t freq, bool autoStart) {
   }
 
   Module* mod = phyLayer->getMod();
-  mod->hal->tone(outPin, freq);
+  mod->hal->_tone(outPin, freq);
   return(RADIOLIB_ERR_NONE);
 }
 
-int16_t AFSKClient::noTone(bool keepOn) {
+int16_t AFSKClient::_noTone(bool keepOn) {
   Module* mod = phyLayer->getMod();
-  mod->hal->noTone(outPin);
+  mod->hal->_noTone(outPin);
   if(keepOn) {
     return(0);
   }

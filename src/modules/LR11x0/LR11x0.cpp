@@ -109,17 +109,17 @@ int16_t LR11x0::beginLRFHSS(uint8_t bw, uint8_t cr, float tcxoVoltage) {
 
 int16_t LR11x0::reset() {
   // run the reset sequence
-  this->mod->hal->pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delay(10);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
 
   // the typical transition duration should be 273 ms
   this->mod->hal->delay(300);
   
   // wait for BUSY to go low
   RadioLibTime_t start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start >= 3000) {
       RADIOLIB_DEBUG_BASIC_PRINTLN("BUSY pin timeout after reset!");
@@ -165,7 +165,7 @@ int16_t LR11x0::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for packet transmission or timeout
   RadioLibTime_t start = this->mod->hal->micros();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->micros() - start > timeout) {
       finishTransmit();
@@ -227,7 +227,7 @@ int16_t LR11x0::receive(uint8_t* data, size_t len) {
   // wait for packet reception or timeout
   bool softTimeout = false;
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     // safety check, the timeout should be done by the radio
     if(this->mod->hal->millis() - start > timeout) {
@@ -287,7 +287,7 @@ int16_t LR11x0::scanChannel(uint8_t symbolNum, uint8_t detPeak, uint8_t detMin) 
   RADIOLIB_ASSERT(state);
 
   // wait for channel activity detected or timeout
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
   }
 
@@ -305,9 +305,9 @@ int16_t LR11x0::standby(uint8_t mode, bool wakeup) {
 
   if(wakeup) {
     // pull NSS low for a while to wake up
-    this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
+    this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
     this->mod->hal->delay(1);
-    this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
+    this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
   }
 
   uint8_t buff[] = { mode };
@@ -340,11 +340,11 @@ int16_t LR11x0::sleep(bool retainConfig, uint32_t sleepTime) {
 }
 
 void LR11x0::setIrqAction(void (*func)(void)) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
 }
 
 void LR11x0::clearIrqAction() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void LR11x0::setPacketReceivedAction(void (*func)(void)) {
@@ -423,7 +423,7 @@ int16_t LR11x0::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
   RADIOLIB_ASSERT(state);
 
   // wait for BUSY to go low (= PA ramp up done)
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
   }
 
@@ -1556,7 +1556,7 @@ int16_t LR11x0::wifiScan(uint8_t wifiType, uint8_t* count, uint8_t mode, uint16_
   // wait for scan finished or timeout
   RadioLibTime_t softTimeout = 30UL * 1000UL;
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start > softTimeout) {
       RADIOLIB_DEBUG_BASIC_PRINTLN("Timeout waiting for IRQ");
@@ -1617,7 +1617,7 @@ int16_t LR11x0::updateFirmware(const uint32_t* image, size_t size, bool nonvolat
 
   // wait for BUSY to go low
   RadioLibTime_t start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start >= 3000) {
       RADIOLIB_DEBUG_BASIC_PRINTLN("BUSY pin timeout after erase!");
@@ -1693,7 +1693,7 @@ int16_t LR11x0::gnssScan(uint16_t* resSize) {
   // wait for scan finished or timeout
   RadioLibTime_t softTimeout = 300UL * 1000UL;
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start > softTimeout) {
       RADIOLIB_DEBUG_BASIC_PRINTLN("Timeout waiting for IRQ");
@@ -1760,8 +1760,8 @@ int16_t LR11x0::getGnssPosition(float* lat, float* lon, bool filtered) {
 
 int16_t LR11x0::modSetup(float tcxoVoltage, uint8_t modem) {
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_ADDR] = Module::BITS_32;
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_CMD] = Module::BITS_16;
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_STATUS] = Module::BITS_8;
@@ -1887,7 +1887,7 @@ int16_t LR11x0::config(uint8_t modem) {
 
   // wait for calibration completion
   this->mod->hal->delay(5);
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
   }
   

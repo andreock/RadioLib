@@ -12,8 +12,8 @@ SX126x::SX126x(Module* mod) : PhysicalLayer(RADIOLIB_SX126X_FREQUENCY_STEP_SIZE,
 int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, float tcxoVoltage, bool useRegulatorLDO) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_ADDR] = Module::BITS_16;
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_CMD] = Module::BITS_8;
   this->mod->spiConfig.statusPos = 1;
@@ -101,8 +101,8 @@ int16_t SX126x::begin(uint8_t cr, uint8_t syncWord, uint16_t preambleLength, flo
 int16_t SX126x::beginFSK(float br, float freqDev, float rxBw, uint16_t preambleLength, float tcxoVoltage, bool useRegulatorLDO) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_ADDR] = Module::BITS_16;
   this->mod->spiConfig.widths[RADIOLIB_MODULE_SPI_WIDTH_CMD] = Module::BITS_8;
   this->mod->spiConfig.statusPos = 1;
@@ -197,10 +197,10 @@ int16_t SX126x::beginFSK(float br, float freqDev, float rxBw, uint16_t preambleL
 
 int16_t SX126x::reset(bool verify) {
   // run the reset sequence
-  this->mod->hal->pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delay(1);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
 
   // return immediately when verification is disabled
   if(!verify) {
@@ -248,7 +248,7 @@ int16_t SX126x::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for packet transmission or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start > timeout) {
       finishTransmit();
@@ -301,7 +301,7 @@ int16_t SX126x::receive(uint8_t* data, size_t len) {
   // wait for packet reception or timeout
   bool softTimeout = false;
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     // safety check, the timeout should be done by the radio
     if(this->mod->hal->millis() - start > timeout) {
@@ -434,7 +434,7 @@ int16_t SX126x::scanChannel(uint8_t symbolNum, uint8_t detPeak, uint8_t detMin) 
   RADIOLIB_ASSERT(state);
 
   // wait for channel activity detected or timeout
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
   }
 
@@ -473,7 +473,7 @@ int16_t SX126x::standby(uint8_t mode, bool wakeup) {
 
   if(wakeup) {
     // pull NSS low to wake up
-    this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
+    this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
   }
 
   uint8_t data[] = { mode };
@@ -481,11 +481,11 @@ int16_t SX126x::standby(uint8_t mode, bool wakeup) {
 }
 
 void SX126x::setDio1Action(void (*func)(void)) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
 }
 
 void SX126x::clearDio1Action() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void SX126x::setPacketReceivedAction(void (*func)(void)) {
@@ -567,7 +567,7 @@ int16_t SX126x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
   RADIOLIB_ASSERT(state);
 
   // wait for BUSY to go low (= PA ramp up done)
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
   }
 
@@ -1563,7 +1563,7 @@ void SX126x::setDirectAction(void (*func)(void)) {
 }
 
 void SX126x::readBit(uint32_t pin) {
-  updateDirectBuffer((uint8_t)this->mod->hal->digitalRead(pin));
+  updateDirectBuffer((uint8_t)this->mod->hal->_digitalRead(pin));
 }
 #endif
 
@@ -2121,7 +2121,7 @@ int16_t SX126x::config(uint8_t modem) {
 
   // wait for calibration completion
   this->mod->hal->delay(5);
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
   }
 

@@ -194,7 +194,7 @@ class SSTVClient {
     SSTVMode_t txMode = Scottie1;
     bool firstLine = true;
 
-    void tone(float freq, RadioLibTime_t len = 0);
+    void _tone(float freq, RadioLibTime_t len = 0);
 };
 
 #endif

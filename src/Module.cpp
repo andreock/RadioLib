@@ -42,8 +42,8 @@ Module& Module::operator=(const Module& mod) {
 static volatile const char info[] = RADIOLIB_INFO;
 void Module::init() {
   this->hal->init();
-  this->hal->pinMode(csPin, this->hal->GpioModeOutput);
-  this->hal->digitalWrite(csPin, this->hal->GpioLevelHigh);
+  this->hal->_pinMode(csPin, this->hal->GpioModeOutput);
+  this->hal->_digitalWrite(csPin, this->hal->GpioLevelHigh);
   RADIOLIB_DEBUG_BASIC_PRINTLN(RADIOLIB_INFO);
 }
 
@@ -202,9 +202,9 @@ void Module::SPItransfer(uint16_t cmd, uint32_t reg, uint8_t* dataOut, uint8_t* 
 
   // do the transfer
   this->hal->spiBeginTransaction();
-  this->hal->digitalWrite(this->csPin, this->hal->GpioLevelLow);
+  this->hal->_digitalWrite(this->csPin, this->hal->GpioLevelLow);
   this->hal->spiTransfer(buffOut, buffLen, buffIn);
-  this->hal->digitalWrite(this->csPin, this->hal->GpioLevelHigh);
+  this->hal->_digitalWrite(this->csPin, this->hal->GpioLevelHigh);
   this->hal->spiEndTransaction();
   
   // copy the data
@@ -343,7 +343,7 @@ int16_t Module::SPItransferStream(const uint8_t* cmd, uint8_t cmdLen, bool write
     this->hal->delay(50);
   } else {
     RadioLibTime_t start = this->hal->millis();
-    while(this->hal->digitalRead(this->gpioPin)) {
+    while(this->hal->_digitalRead(this->gpioPin)) {
       this->hal->yield();
       if(this->hal->millis() - start >= this->spiConfig.timeout) {
         RADIOLIB_DEBUG_BASIC_PRINTLN("GPIO pre-transfer timeout, is it connected?");
@@ -364,9 +364,9 @@ int16_t Module::SPItransferStream(const uint8_t* cmd, uint8_t cmdLen, bool write
 
   // do the transfer
   this->hal->spiBeginTransaction();
-  this->hal->digitalWrite(this->csPin, this->hal->GpioLevelLow);
+  this->hal->_digitalWrite(this->csPin, this->hal->GpioLevelLow);
   this->hal->spiTransfer(buffOut, buffLen, buffIn);
-  this->hal->digitalWrite(this->csPin, this->hal->GpioLevelHigh);
+  this->hal->_digitalWrite(this->csPin, this->hal->GpioLevelHigh);
   this->hal->spiEndTransaction();
 
   // wait for GPIO to go high and then low
@@ -376,7 +376,7 @@ int16_t Module::SPItransferStream(const uint8_t* cmd, uint8_t cmdLen, bool write
     } else {
       this->hal->delayMicroseconds(1);
       RadioLibTime_t start = this->hal->millis();
-      while(this->hal->digitalRead(this->gpioPin)) {
+      while(this->hal->_digitalRead(this->gpioPin)) {
         this->hal->yield();
         if(this->hal->millis() - start >= this->spiConfig.timeout) {
           RADIOLIB_DEBUG_BASIC_PRINTLN("GPIO post-transfer timeout, is it connected?");
@@ -582,7 +582,7 @@ void Module::setRfSwitchTable(const uint32_t (&pins)[RFSWITCH_MAX_PINS], const R
   memcpy(this->rfSwitchPins, pins, sizeof(this->rfSwitchPins));
   this->rfSwitchTable = table;
   for(size_t i = 0; i < RFSWITCH_MAX_PINS; i++)
-    this->hal->pinMode(pins[i], this->hal->GpioModeOutput);
+    this->hal->_pinMode(pins[i], this->hal->GpioModeOutput);
 }
 
 const Module::RfSwitchMode_t *Module::findRfSwitchMode(uint8_t mode) const {
@@ -607,7 +607,7 @@ void Module::setRfSwitchState(uint8_t mode) {
   for(size_t i = 0; i < RFSWITCH_MAX_PINS; i++) {
     uint32_t pin = this->rfSwitchPins[i];
     if (pin != RADIOLIB_NC)
-      this->hal->digitalWrite(pin, *value);
+      this->hal->_digitalWrite(pin, *value);
     ++value;
   }
 }

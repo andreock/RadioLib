@@ -11,7 +11,7 @@ int16_t CC1101::begin(float freq, float br, float freqDev, float rxBw, int8_t pw
   this->mod->spiConfig.cmds[RADIOLIB_MODULE_SPI_COMMAND_READ] = RADIOLIB_CC1101_CMD_READ;
   this->mod->spiConfig.cmds[RADIOLIB_MODULE_SPI_COMMAND_WRITE] = RADIOLIB_CC1101_CMD_WRITE;
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
 
   // try to find the CC1101 chip
   uint8_t i = 0;
@@ -89,11 +89,11 @@ int16_t CC1101::begin(float freq, float br, float freqDev, float rxBw, int8_t pw
 
 void CC1101::reset() {
   // this is the manual power-on-reset sequence
-  this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delayMicroseconds(5);
-  this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
   this->mod->hal->delayMicroseconds(40);
-  this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delay(10);
   SPIsendCommand(RADIOLIB_CC1101_CMD_RESET);
 }
@@ -108,7 +108,7 @@ int16_t CC1101::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for transmission start or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -119,7 +119,7 @@ int16_t CC1101::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for transmission end or timeout
   start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getGpio())) {
+  while(this->mod->hal->_digitalRead(this->mod->getGpio())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -141,7 +141,7 @@ int16_t CC1101::receive(uint8_t* data, size_t len) {
 
   // wait for packet start or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -153,7 +153,7 @@ int16_t CC1101::receive(uint8_t* data, size_t len) {
 
   // wait for packet end or timeout
   start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -251,11 +251,11 @@ int16_t CC1101::packetMode() {
 }
 
 void CC1101::setGdo0Action(void (*func)(void), uint32_t dir) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, dir);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, dir);
 }
 
 void CC1101::clearGdo0Action() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void CC1101::setPacketReceivedAction(void (*func)(void)) {
@@ -278,15 +278,15 @@ void CC1101::setGdo2Action(void (*func)(void), uint32_t dir) {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, dir);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, dir);
 }
 
 void CC1101::clearGdo2Action() {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
 }
 
 int16_t CC1101::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
@@ -981,7 +981,7 @@ void CC1101::setDirectAction(void (*func)(void)) {
 }
 
 void CC1101::readBit(uint32_t pin) {
-  updateDirectBuffer((uint8_t)this->mod->hal->digitalRead(pin));
+  updateDirectBuffer((uint8_t)this->mod->hal->_digitalRead(pin));
 }
 #endif
 
@@ -1142,7 +1142,7 @@ void CC1101::SPIwriteRegisterBurst(uint8_t reg, uint8_t* data, size_t len) {
 
 void CC1101::SPIsendCommand(uint8_t cmd) {
   // pull NSS low
-  this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelLow);
 
   // start transfer
   this->mod->hal->spiBeginTransaction();
@@ -1153,7 +1153,7 @@ void CC1101::SPIsendCommand(uint8_t cmd) {
 
   // stop transfer
   this->mod->hal->spiEndTransaction();
-  this->mod->hal->digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_digitalWrite(this->mod->getCs(), this->mod->hal->GpioLevelHigh);
   RADIOLIB_DEBUG_SPI_PRINTLN("CMD\tW\t%02X\t%02X", cmd, status);
   (void)status;
 }

@@ -41,8 +41,8 @@ int16_t FSK4Client::begin(float base, uint32_t shift, uint16_t rate) {
 }
 
 void FSK4Client::idle() {
-  // Idle at Tone 0.
-  tone(0);
+  // Idle at _tone 0.
+  _tone(0);
 }
 
 int16_t FSK4Client::setCorrection(int16_t offsets[], float length) {
@@ -70,7 +70,7 @@ size_t FSK4Client::write(uint8_t b) {
     uint8_t symbol = (b & 0xC0) >> 6;
 
     // Modulate
-    FSK4Client::tone(symbol);
+    FSK4Client::_tone(symbol);
 
     // Shift to next symbol
     b = b << 2;
@@ -79,7 +79,7 @@ size_t FSK4Client::write(uint8_t b) {
   return(1);
 }
 
-void FSK4Client::tone(uint8_t i) {
+void FSK4Client::_tone(uint8_t i) {
   Module* mod = phyLayer->getMod();
   RadioLibTime_t start = mod->hal->micros();
   transmitDirect(baseFreq + tones[i], baseFreqHz + tonesHz[i]);
@@ -89,7 +89,7 @@ void FSK4Client::tone(uint8_t i) {
 int16_t FSK4Client::transmitDirect(uint32_t freq, uint32_t freqHz) {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->tone(freqHz));
+    return(audioClient->_tone(freqHz));
   }
   #endif
   return(phyLayer->transmitDirect(freq));
@@ -101,7 +101,7 @@ int16_t FSK4Client::standby() {
   mod->waitForMicroseconds(0, 0);
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->noTone());
+    return(audioClient->_noTone());
   }
   #endif
   return(phyLayer->standby());

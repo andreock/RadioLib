@@ -65,7 +65,7 @@ class RadioLibHal {
       \param pin Pin to be changed (platform-specific).
       \param mode Mode to be set (platform-specific).
     */
-    virtual void pinMode(uint32_t pin, uint32_t mode) = 0;
+    virtual void _pinMode(uint32_t pin, uint32_t mode) = 0;
 
     /*!
       \brief Digital write method.
@@ -73,7 +73,7 @@ class RadioLibHal {
       \param pin Pin to be changed (platform-specific).
       \param value Value to set (platform-specific).
     */
-    virtual void digitalWrite(uint32_t pin, uint32_t value) = 0;
+    virtual void _digitalWrite(uint32_t pin, uint32_t value) = 0;
 
     /*!
       \brief Digital read method.
@@ -81,7 +81,7 @@ class RadioLibHal {
       \param pin Pin to be changed (platform-specific).
       \returns Value read on the pin (platform-specific).
     */
-    virtual uint32_t digitalRead(uint32_t pin) = 0;
+    virtual uint32_t _digitalRead(uint32_t pin) = 0;
     
     /*!
       \brief Method to attach function to an external interrupt.
@@ -90,14 +90,14 @@ class RadioLibHal {
       \param interruptCb Interrupt service routine to execute.
       \param mode Rising/falling mode (platform-specific).
     */
-    virtual void attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) = 0;
+    virtual void _attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) = 0;
 
     /*!
       \brief Method to detach function from an external interrupt.
       Must be implemented by the platform-specific hardware abstraction!
       \param interruptNum Interrupt number to detach from (platform-specific).
     */
-    virtual void detachInterrupt(uint32_t interruptNum) = 0;
+    virtual void _detachInterrupt(uint32_t interruptNum) = 0;
 
     /*!
       \brief Blocking wait function.
@@ -135,7 +135,7 @@ class RadioLibHal {
       \param timeout Timeout in microseconds.
       \returns Pulse length in microseconds, or 0 if the pulse did not start before timeout.
     */
-    virtual long pulseIn(uint32_t pin, uint32_t state, RadioLibTime_t timeout) = 0;
+    virtual long _pulseIn(uint32_t pin, uint32_t state, RadioLibTime_t timeout) = 0;
 
     /*!
       \brief SPI initialization method.
@@ -188,13 +188,13 @@ class RadioLibHal {
       \param frequency Frequency of the square wave.
       \param duration Duration of the tone in ms. When set to 0, the tone will be infinite.
     */
-    virtual void tone(uint32_t pin, unsigned int frequency, RadioLibTime_t duration = 0);
+    virtual void _tone(uint32_t pin, unsigned int frequency, RadioLibTime_t duration = 0);
 
     /*!
       \brief Method to stop producing a tone.
       \param pin Pin which is currently producing the tone.
     */
-    virtual void noTone(uint32_t pin);
+    virtual void _noTone(uint32_t pin);
     
     /*!
       \brief Yield method, called from long loops in multi-threaded environment (to prevent blocking other threads).

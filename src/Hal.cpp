@@ -16,13 +16,13 @@ void RadioLibHal::term() {
 
 }
 
-void RadioLibHal::tone(uint32_t pin, unsigned int frequency, RadioLibTime_t duration) {
+void RadioLibHal::_tone(uint32_t pin, unsigned int frequency, RadioLibTime_t duration) {
   (void)pin;
   (void)frequency;
   (void)duration;
 }
 
-void RadioLibHal::noTone(uint32_t pin) {
+void RadioLibHal::_noTone(uint32_t pin) {
   (void)pin;
 }
 

@@ -84,7 +84,7 @@ size_t HellClient::write(uint8_t b) {
 int16_t HellClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->tone(freqHz));
+    return(audioClient->_tone(freqHz));
   }
   #endif
   return(phyLayer->transmitDirect(freq));
@@ -93,7 +93,7 @@ int16_t HellClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
 int16_t HellClient::standby() {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->noTone(invert));
+    return(audioClient->_noTone(invert));
   }
   #endif
   return(phyLayer->standby(RADIOLIB_STANDBY_WARM));

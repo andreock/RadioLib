@@ -88,7 +88,7 @@ class FSK4Client {
     uint32_t tones[4] = { 0 };
     uint32_t tonesHz[4] = { 0 };
 
-    void tone(uint8_t i);
+    void _tone(uint8_t i);
 
     int16_t transmitDirect(uint32_t freq = 0, uint32_t freqHz = 0);
     int32_t getRawShift(int32_t shift);

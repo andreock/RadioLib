@@ -9,7 +9,7 @@ RF69::RF69(Module* module) : PhysicalLayer(RADIOLIB_RF69_FREQUENCY_STEP_SIZE, RA
 int16_t RF69::begin(float freq, float br, float freqDev, float rxBw, int8_t pwr, uint8_t preambleLen) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
 
   // try to find the RF69 chip
   uint8_t i = 0;
@@ -91,10 +91,10 @@ int16_t RF69::begin(float freq, float br, float freqDev, float rxBw, int8_t pwr,
 }
 
 void RF69::reset() {
-  this->mod->hal->pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
   this->mod->hal->delay(1);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delay(10);
 }
 
@@ -108,7 +108,7 @@ int16_t RF69::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for transmission end or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -130,7 +130,7 @@ int16_t RF69::receive(uint8_t* data, size_t len) {
 
   // wait for packet reception or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(!this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(!this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
 
     if(this->mod->hal->millis() - start > timeout) {
@@ -268,26 +268,26 @@ int16_t RF69::startReceive(uint32_t timeout, uint32_t irqFlags, uint32_t irqMask
 }
 
 void RF69::setDio0Action(void (*func)(void)) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptRising);
 }
 
 void RF69::clearDio0Action() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void RF69::setDio1Action(void (*func)(void)) {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, this->mod->hal->GpioInterruptRising);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, this->mod->hal->GpioInterruptRising);
 }
 
 void RF69::clearDio1Action() {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()));
 }
 
 void RF69::setPacketReceivedAction(void (*func)(void)) {
@@ -311,10 +311,10 @@ void RF69::setFifoEmptyAction(void (*func)(void)) {
   if(this->mod->getGpio() == RADIOLIB_NC) {
     return;
   }
-  this->mod->hal->pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getGpio(), this->mod->hal->GpioModeInput);
 
   // we need to invert the logic here (as compared to setDio1Action), since we are using the "FIFO not empty interrupt"
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, this->mod->hal->GpioInterruptFalling);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getGpio()), func, this->mod->hal->GpioInterruptFalling);
 }
 
 void RF69::clearFifoEmptyAction() {
@@ -962,7 +962,7 @@ void RF69::setDirectAction(void (*func)(void)) {
 }
 
 void RF69::readBit(uint32_t pin) {
-  updateDirectBuffer((uint8_t)this->mod->hal->digitalRead(pin));
+  updateDirectBuffer((uint8_t)this->mod->hal->_digitalRead(pin));
 }
 #endif
 

@@ -52,7 +52,7 @@ class PiHal : public RadioLibHal {
 
     // GPIO-related methods (pinMode, digitalWrite etc.) should check
     // RADIOLIB_NC as an alias for non-connected pins
-    void pinMode(uint32_t pin, uint32_t mode) override {
+    void _pinMode(uint32_t pin, uint32_t mode) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -67,7 +67,7 @@ class PiHal : public RadioLibHal {
           result = lgGpioClaimOutput(_gpioHandle, flags, pin, LG_HIGH);
           break;
         default:
-          fprintf(stderr, "Unknown pinMode mode %" PRIu32 "\n", mode);
+          fprintf(stderr, "Unknown _pinMode mode %" PRIu32 "\n", mode);
           return;
       }
 
@@ -77,7 +77,7 @@ class PiHal : public RadioLibHal {
       }
     }
 
-    void digitalWrite(uint32_t pin, uint32_t value) override {
+    void _digitalWrite(uint32_t pin, uint32_t value) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -88,7 +88,7 @@ class PiHal : public RadioLibHal {
       }
     }
 
-    uint32_t digitalRead(uint32_t pin) override {
+    uint32_t _digitalRead(uint32_t pin) override {
       if(pin == RADIOLIB_NC) {
         return(0);
       }
@@ -100,7 +100,7 @@ class PiHal : public RadioLibHal {
       return result;
     }
 
-    void attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
+    void _attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
       if((interruptNum == RADIOLIB_NC) || (interruptNum > PI_MAX_USER_GPIO)) {
         return;
       }
@@ -120,7 +120,7 @@ class PiHal : public RadioLibHal {
       lgGpioSetAlertsFunc(_gpioHandle, interruptNum, lgpioAlertHandler, (void *)this);
     }
 
-    void detachInterrupt(uint32_t interruptNum) override {
+    void _detachInterrupt(uint32_t interruptNum) override {
       if((interruptNum == RADIOLIB_NC) || (interruptNum > PI_MAX_USER_GPIO)) {
         return;
       }
@@ -167,16 +167,16 @@ class PiHal : public RadioLibHal {
       return time;
     }
 
-    long pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
+    long _pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
       if(pin == RADIOLIB_NC) {
         return(0);
       }
 
-      this->pinMode(pin, PI_INPUT);
+      this->_pinMode(pin, PI_INPUT);
       uint32_t start = this->micros();
       uint32_t curtick = this->micros();
 
-      while(this->digitalRead(pin) == state) {
+      while(this->_digitalRead(pin) == state) {
         if((this->micros() - curtick) > timeout) {
           return(0);
         }
@@ -211,11 +211,11 @@ class PiHal : public RadioLibHal {
       }
     }
 
-    void tone(uint32_t pin, unsigned int frequency, unsigned long duration = 0) {
+    void _tone(uint32_t pin, unsigned int frequency, unsigned long duration = 0) {
       lgTxPwm(_gpioHandle, pin, frequency, 50, 0, duration);
     }
 
-    void noTone(uint32_t pin) {
+    void _noTone(uint32_t pin) {
       lgTxPwm(_gpioHandle, pin, 0, 0, 0, 0);
     }
 

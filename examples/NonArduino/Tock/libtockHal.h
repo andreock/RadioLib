@@ -95,7 +95,7 @@ class TockHal : public RadioLibHal {
 
     // GPIO-related methods (pinMode, digitalWrite etc.) should check
     // RADIOLIB_NC as an alias for non-connected pins
-    void pinMode(uint32_t pin, uint32_t mode) override {
+    void _pinMode(uint32_t pin, uint32_t mode) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -107,7 +107,7 @@ class TockHal : public RadioLibHal {
       }
     }
 
-    void digitalWrite(uint32_t pin, uint32_t value) override {
+    void _digitalWrite(uint32_t pin, uint32_t value) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -119,7 +119,7 @@ class TockHal : public RadioLibHal {
       }
     }
 
-    uint32_t digitalRead(uint32_t pin) override {
+    uint32_t _digitalRead(uint32_t pin) override {
       int value;
 
       if(pin == RADIOLIB_NC) {
@@ -131,7 +131,7 @@ class TockHal : public RadioLibHal {
       return value;
     }
 
-    void attachInterrupt(uint32_t interruptNum, gpioIrqFn interruptCb, uint32_t mode) override {
+    void _attachInterrupt(uint32_t interruptNum, gpioIrqFn interruptCb, uint32_t mode) override {
       if(interruptNum == RADIOLIB_NC) {
         return;
       }
@@ -143,7 +143,7 @@ class TockHal : public RadioLibHal {
       libtock_lora_phy_gpio_enable_interrupt(interruptNum, libtock_change);
     }
 
-    void detachInterrupt(uint32_t interruptNum) override {
+    void _detachInterrupt(uint32_t interruptNum) override {
       if(interruptNum == RADIOLIB_NC) {
         return;
       }
@@ -172,7 +172,7 @@ class TockHal : public RadioLibHal {
       return millis() / 1000;
     }
 
-    long pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
+    long _pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
       return 0;
     }
 

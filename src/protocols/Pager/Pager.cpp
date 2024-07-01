@@ -277,7 +277,7 @@ int16_t PagerClient::startReceiveCommon() {
 
   // now set up the direct mode reception
   Module* mod = phyLayer->getMod();
-  mod->hal->pinMode(readBitPin, mod->hal->GpioModeInput);
+  mod->hal->_pinMode(readBitPin, mod->hal->GpioModeInput);
 
   // set direct sync word to the frame sync word
   // the logic here is inverted, because modules like SX1278

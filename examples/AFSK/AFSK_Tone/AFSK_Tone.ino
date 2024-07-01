@@ -77,12 +77,12 @@ void loop() {
   
   // 400 Hz tone
   Serial.print(F("[AFSK] 400 Hz tone ... "));
-  audio.tone(400);
+  audio._tone(400);
   delay(1000);
 
   // silence
   Serial.println(F("done!"));
-  audio.noTone();
+  audio._noTone();
   delay(1000);
 
   // AFSKClient can also be used to transmit HAM-friendly

@@ -64,7 +64,7 @@ int MorseClient::read(uint8_t* symbol, uint8_t* len, float low, float high) {
   Module* mod = phyLayer->getMod();
 
   // measure pulse duration in us
-  uint32_t duration = mod->hal->pulseIn(audioClient->outPin, mod->hal->GpioLevelLow, 4*basePeriod);
+  uint32_t duration = mod->hal->_pulseIn(audioClient->outPin, mod->hal->GpioLevelLow, 4*basePeriod);
 
   // decide if this is a signal, or pause
   if((duration > low*basePeriod) && (duration < high*basePeriod)) {
@@ -169,7 +169,7 @@ size_t MorseClient::write(uint8_t b) {
 int16_t MorseClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->tone(freqHz));
+    return(audioClient->_tone(freqHz));
   }
   #endif
   return(phyLayer->transmitDirect(freq));
@@ -178,7 +178,7 @@ int16_t MorseClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
 int16_t MorseClient::standby() {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->noTone(true));
+    return(audioClient->_noTone(true));
   }
   #endif
   return(phyLayer->standby());

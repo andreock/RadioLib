@@ -35,7 +35,7 @@ public:
 
   // GPIO-related methods (pinMode, digitalWrite etc.) should check
   // RADIOLIB_NC as an alias for non-connected pins
-  void pinMode(uint32_t pin, uint32_t mode) override {
+  void _pinMode(uint32_t pin, uint32_t mode) override {
     if (pin == RADIOLIB_NC) {
       return;
     }
@@ -44,7 +44,7 @@ public:
     gpio_set_dir(pin, mode);
   }
 
-  void digitalWrite(uint32_t pin, uint32_t value) override {
+  void _digitalWrite(uint32_t pin, uint32_t value) override {
     if (pin == RADIOLIB_NC) {
       return;
     }
@@ -52,7 +52,7 @@ public:
     gpio_put(pin, (bool)value);
   }
 
-  uint32_t digitalRead(uint32_t pin) override {
+  uint32_t _digitalRead(uint32_t pin) override {
     if (pin == RADIOLIB_NC) {
       return 0;
     }
@@ -60,7 +60,7 @@ public:
     return gpio_get(pin);
   }
 
-  void attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
+  void _attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
     if (interruptNum == RADIOLIB_NC) {
       return;
     }
@@ -68,7 +68,7 @@ public:
     gpio_set_irq_enabled_with_callback(interruptNum, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, (gpio_irq_callback_t)interruptCb);
   }
 
-  void detachInterrupt(uint32_t interruptNum) override {
+  void _detachInterrupt(uint32_t interruptNum) override {
     if (interruptNum == RADIOLIB_NC) {
       return;
     }
@@ -92,16 +92,16 @@ public:
     return to_us_since_boot(get_absolute_time());
   }
 
-  long pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
+  long _pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
     if (pin == RADIOLIB_NC) {
       return 0;
     }
 
-    this->pinMode(pin, GPIO_IN);
+    this->_pinMode(pin, GPIO_IN);
     uint32_t start = this->micros();
     uint32_t curtick = this->micros();
 
-    while (this->digitalRead(pin) == state) {
+    while (this->_digitalRead(pin) == state) {
       if ((this->micros() - curtick) > timeout) {
         return 0;
       }

@@ -40,14 +40,14 @@ class AFSKClient  {
       \param autoStart Whether to automatically enter transmission mode. Defaults to true.
       \returns \ref status_codes
     */
-    int16_t tone(uint16_t freq, bool autoStart = true);
+    int16_t _tone(uint16_t freq, bool autoStart = true);
 
     /*!
       \brief Stops transmitting audio tone.
       \param keepOn Keep transmitter on - this may limit noise when switching transmitter on or off.
       \returns \ref status_codes
     */
-    int16_t noTone(bool keepOn = false);
+    int16_t _noTone(bool keepOn = false);
 
 #if !RADIOLIB_GODMODE
   private:

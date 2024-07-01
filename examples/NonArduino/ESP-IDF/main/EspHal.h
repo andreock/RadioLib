@@ -136,7 +136,7 @@ class EspHal : public RadioLibHal {
 
     // GPIO-related methods (pinMode, digitalWrite etc.) should check
     // RADIOLIB_NC as an alias for non-connected pins
-    void pinMode(uint32_t pin, uint32_t mode) override {
+    void _pinMode(uint32_t pin, uint32_t mode) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -154,7 +154,7 @@ class EspHal : public RadioLibHal {
       gpio_config(&conf);
     }
 
-    void digitalWrite(uint32_t pin, uint32_t value) override {
+    void _digitalWrite(uint32_t pin, uint32_t value) override {
       if(pin == RADIOLIB_NC) {
         return;
       }
@@ -162,7 +162,7 @@ class EspHal : public RadioLibHal {
       gpio_set_level((gpio_num_t)pin, value);
     }
 
-    uint32_t digitalRead(uint32_t pin) override {
+    uint32_t _digitalRead(uint32_t pin) override {
       if(pin == RADIOLIB_NC) {
         return(0);
       }
@@ -170,7 +170,7 @@ class EspHal : public RadioLibHal {
       return(gpio_get_level((gpio_num_t)pin));
     }
 
-    void attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
+    void _attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
       if(interruptNum == RADIOLIB_NC) {
         return;
       }
@@ -183,7 +183,7 @@ class EspHal : public RadioLibHal {
       gpio_isr_handler_add((gpio_num_t)interruptNum, (void (*)(void*))interruptCb, NULL);
     }
 
-    void detachInterrupt(uint32_t interruptNum) override {
+    void _detachInterrupt(uint32_t interruptNum) override {
       if(interruptNum == RADIOLIB_NC) {
         return;
       }
@@ -220,16 +220,16 @@ class EspHal : public RadioLibHal {
       return((unsigned long)(esp_timer_get_time()));
     }
 
-    long pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
+    long _pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override {
       if(pin == RADIOLIB_NC) {
         return(0);
       }
 
-      this->pinMode(pin, INPUT);
+      this->_pinMode(pin, INPUT);
       uint32_t start = this->micros();
       uint32_t curtick = this->micros();
 
-      while(this->digitalRead(pin) == state) {
+      while(this->_digitalRead(pin) == state) {
         if((this->micros() - curtick) > timeout) {
           return(0);
         }
@@ -272,9 +272,9 @@ class EspHal : public RadioLibHal {
       this->spi->clock.val = spiFrequencyToClockDiv(2000000);
 
       // initialize pins
-      this->pinMode(this->spiSCK, OUTPUT);
-      this->pinMode(this->spiMISO, INPUT);
-      this->pinMode(this->spiMOSI, OUTPUT);
+      this->_pinMode(this->spiSCK, OUTPUT);
+      this->_pinMode(this->spiMISO, INPUT);
+      this->_pinMode(this->spiMOSI, OUTPUT);
       gpio_matrix_out(this->spiSCK, HSPICLK_OUT_IDX, false, false);
       gpio_matrix_in(this->spiMISO, HSPIQ_OUT_IDX, false);
       gpio_matrix_out(this->spiMOSI, HSPID_IN_IDX, false, false);

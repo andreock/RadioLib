@@ -14,7 +14,7 @@ int16_t SX1280::range(bool master, uint32_t addr, uint16_t calTable[3][6]) {
   // wait until ranging is finished
   Module* mod = this->getMod();
   RadioLibTime_t start = mod->hal->millis();
-  while(!mod->hal->digitalRead(mod->getIrq())) {
+  while(!mod->hal->_digitalRead(mod->getIrq())) {
     mod->hal->yield();
     if(mod->hal->millis() - start > 10000) {
       clearIrqStatus();

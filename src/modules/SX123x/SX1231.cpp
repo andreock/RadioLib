@@ -9,8 +9,8 @@ int16_t SX1231::begin(float freq, float br, float freqDev, float rxBw, int8_t po
   // set module properties
   Module* mod = this->getMod();
   mod->init();
-  mod->hal->pinMode(mod->getIrq(), mod->hal->GpioModeInput);
-  mod->hal->pinMode(mod->getRst(), mod->hal->GpioModeOutput);
+  mod->hal->_pinMode(mod->getIrq(), mod->hal->GpioModeInput);
+  mod->hal->_pinMode(mod->getRst(), mod->hal->GpioModeOutput);
 
   // try to find the SX1231 chip
   uint8_t i = 0;

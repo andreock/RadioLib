@@ -106,7 +106,7 @@ void RTTYClient::space() {
 int16_t RTTYClient::transmitDirect(uint32_t freq, uint32_t freqHz) {
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->tone(freqHz));
+    return(audioClient->_tone(freqHz));
   }
   #endif
   return(phyLayer->transmitDirect(freq));
@@ -118,7 +118,7 @@ int16_t RTTYClient::standby() {
   mod->waitForMicroseconds(0, 0);
   #if !RADIOLIB_EXCLUDE_AFSK
   if(audioClient != nullptr) {
-    return(audioClient->noTone());
+    return(audioClient->_noTone());
   }
   #endif
   return(phyLayer->standby());

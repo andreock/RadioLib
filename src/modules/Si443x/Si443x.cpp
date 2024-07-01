@@ -9,9 +9,9 @@ Si443x::Si443x(Module* mod) : PhysicalLayer(RADIOLIB_SI443X_FREQUENCY_STEP_SIZE,
 int16_t Si443x::begin(float br, float freqDev, float rxBw, uint8_t preambleLen) {
   // set module properties
   this->mod->init();
-  this->mod->hal->pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
-  this->mod->hal->pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_pinMode(this->mod->getIrq(), this->mod->hal->GpioModeInput);
+  this->mod->hal->_pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
 
   // try to find the Si443x chip
   if(!Si443x::findChip()) {
@@ -64,10 +64,10 @@ int16_t Si443x::begin(float br, float freqDev, float rxBw, uint8_t preambleLen) 
 }
 
 void Si443x::reset() {
-  this->mod->hal->pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
+  this->mod->hal->_pinMode(this->mod->getRst(), this->mod->hal->GpioModeOutput);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelHigh);
   this->mod->hal->delay(1);
-  this->mod->hal->digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
+  this->mod->hal->_digitalWrite(this->mod->getRst(), this->mod->hal->GpioLevelLow);
   this->mod->hal->delay(100);
 }
 
@@ -81,7 +81,7 @@ int16_t Si443x::transmit(uint8_t* data, size_t len, uint8_t addr) {
 
   // wait for transmission end or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(this->mod->hal->_digitalRead(this->mod->getIrq())) {
     this->mod->hal->yield();
     if(this->mod->hal->millis() - start > timeout) {
       finishTransmit();
@@ -102,7 +102,7 @@ int16_t Si443x::receive(uint8_t* data, size_t len) {
 
   // wait for packet reception or timeout
   RadioLibTime_t start = this->mod->hal->millis();
-  while(this->mod->hal->digitalRead(this->mod->getIrq())) {
+  while(this->mod->hal->_digitalRead(this->mod->getIrq())) {
     if(this->mod->hal->millis() - start > timeout) {
       standby();
       clearIRQFlags();
@@ -203,11 +203,11 @@ int16_t Si443x::packetMode() {
 }
 
 void Si443x::setIrqAction(void (*func)(void)) {
-  this->mod->hal->attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptFalling);
+  this->mod->hal->_attachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()), func, this->mod->hal->GpioInterruptFalling);
 }
 
 void Si443x::clearIrqAction() {
-  this->mod->hal->detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
+  this->mod->hal->_detachInterrupt(this->mod->hal->pinToInterrupt(this->mod->getIrq()));
 }
 
 void Si443x::setPacketReceivedAction(void (*func)(void)) {
@@ -621,7 +621,7 @@ void Si443x::setDirectAction(void (*func)(void)) {
 }
 
 void Si443x::readBit(uint32_t pin) {
-  updateDirectBuffer((uint8_t)this->mod->hal->digitalRead(pin));
+  updateDirectBuffer((uint8_t)this->mod->hal->_digitalRead(pin));
 }
 #endif
 

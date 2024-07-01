@@ -75,7 +75,7 @@ void loop() {
   Serial.print(F("[Pager] Transmitting messages ... "));
 
   // the simples form of "message" is just a tone on the destination pager
-  int state = pager.sendTone(1234567);
+  int state = pager._sendTone(1234567);
   delay(500);
 
   // next, transmit numeric (BCD) message to the destination pager

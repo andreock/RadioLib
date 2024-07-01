@@ -82,13 +82,13 @@ void loop() {
   // same as Arduino tone() function
 
   // 400 Hz tone
-  Serial.print(F("[AFSK] 400 Hz tone ... "));
-  audio.tone(400);
+  Serial.print(F("[AFSK] 400 Hz _tone ... "));
+  audio._tone(400);
   delay(1000);
 
   // silence
   Serial.println(F("done!"));
-  audio.noTone();
+  audio._noTone();
   delay(1000);
 
   // AFSKClient can also be used to transmit HAM-friendly
